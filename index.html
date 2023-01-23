@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Arabic Phrase Repeater</title>
+</head>
+<body>
+  <h1>Arabic Phrase Repeater</h1>
+
+  <form id="phrase-form">
+    <label for="phrase-input">Enter a phrase in Arabic:</label>
+    <input type="text" id="phrase-input" placeholder="Enter phrase here" required>
+    <button type="submit">Add Phrase</button>
+  </form>
+
+  <ul id="phrase-list"></ul>
+
+  <button id="start-button" disabled>Start Repeating</button>
+  <div id="counter"></div>
+
+  <script>
+    // Initialize variables
+    let phraseList = [];
+    let selectedPhrase;
+    let recognition;
+    let counter = 0;
+
+    // Add phrase to list when form is submitted
+    document.getElementById("phrase-form").addEventListener("submit", event => {
+      event.preventDefault();
+      const phraseInput = document.getElementById("phrase-input");
+      const phrase = phraseInput.value;
+      phraseList.push(phrase);
+      phraseInput.value = "";
+
+      // Create list item for phrase
+      const listItem = document.createElement("li");
+      listItem.innerText = phrase;
+      document.getElementById("phrase-list").appendChild(listItem);
+
+      // Enable start button if list is not empty
+      if (phraseList.length > 0) {
+        document.getElementById("start-button").disabled = false;
+      }
+    });
+
+    // Select phrase when list item is clicked
+    document.getElementById("phrase-list").addEventListener("click", event => {
+      if (event.target.tagName === "LI") {
+        selectedPhrase = event.target.innerText;
+        document.getElementById("start-button").innerText = "Start Repeating " + selectedPhrase;
+      }
+    });
+
+    // Start recognition and counting when start button is clicked
+    document.getElementById("start-button").addEventListener("click", event => {
+      recognition = new webkitSpeechRecognition();
+      recognition.lang = 'ar-SA';
+      recognition.interimResults = false;
+      recognition.start();
+      recognition.onresult = event => {
+        const transcript = event.results[0][0].transcript;
+        if (transcript === selectedPhrase) {
+          counter++;
+          document.getElementById("counter").innerText = "Count: " + counter;
+        }
+      }
+    });
+  </script>
+</body>
+</html>
